@@ -28,8 +28,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         if (success) {
-          // Navigate to Home or Profile
-          Navigator.pushReplacementNamed(context, '/profile');
+          // Navigate to Transaction List
+          Navigator.pushReplacementNamed(context, '/transactions');
         } else {
           ScaffoldMessenger.of(
             context,

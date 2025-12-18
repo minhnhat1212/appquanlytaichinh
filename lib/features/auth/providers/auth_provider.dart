@@ -5,11 +5,13 @@ import '../../../core/constants/api_constants.dart';
 
 class AuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
+  String _userId = ''; // Store MongoDB _id
   String _username = '';
   String _email = '';
   String _phone = '';
 
   bool get isLoggedIn => _isLoggedIn;
+  String get userId => _userId;
   String get username => _username;
   String get email => _email;
   String get phone => _phone;
@@ -27,6 +29,7 @@ class AuthProvider with ChangeNotifier {
         final data = jsonDecode(response.body);
         if (data['success']) {
           _isLoggedIn = true;
+          _userId = data['user']['id'];
           _email = data['user']['email'];
           _username = data['user']['name'];
           _phone = data['user']['phone'] ?? '';

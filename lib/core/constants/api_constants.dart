@@ -14,4 +14,10 @@ class ApiConstants {
   static String get login => '$baseUrl/api/auth/login';
   static String get register => '$baseUrl/api/auth/register';
   static String get changePassword => '$baseUrl/api/auth/change-password';
+
+  static String get categories => '$baseUrl/api/categories';
+  static String transactions(String userId) =>
+      '$baseUrl/api/transactions/$userId';
+  static String get addTransaction => '$baseUrl/api/transactions';
+  static String deleteTransaction(String id) => '$baseUrl/api/transactions/$id';
 }

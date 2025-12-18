@@ -7,6 +7,9 @@ import 'features/auth/screens/register_screen.dart';
 import 'features/auth/screens/forgot_password_screen.dart';
 import 'features/user/screens/profile_screen.dart';
 import 'features/user/screens/change_password_screen.dart';
+import 'features/transaction/providers/transaction_provider.dart';
+import 'features/transaction/screens/transaction_list_screen.dart';
+import 'features/transaction/screens/add_transaction_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +21,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => TransactionProvider()),
+      ],
       child: MaterialApp(
         title: 'Quản Lý Tài Chính',
         debugShowCheckedModeBanner: false,
@@ -38,6 +44,10 @@ class MyApp extends StatelessWidget {
           '/forgot-password': (context) => ForgotPasswordScreen(),
           '/profile': (context) => const ProfileScreen(),
           '/change-password': (context) => const ChangePasswordScreen(),
+
+          // Transaction Routes
+          '/transactions': (context) => const TransactionListScreen(),
+          '/add-transaction': (context) => const AddTransactionScreen(),
         },
       ),
     );
