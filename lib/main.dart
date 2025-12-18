@@ -35,9 +35,24 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSwatch().copyWith(
             secondary: AppColors.secondary,
             primary: AppColors.primary,
+            surface: AppColors.surface,
+            error: AppColors.error,
           ),
-          fontFamily: 'Inter', // Assuming Inter or system font
+          fontFamily: 'Inter',
           useMaterial3: true,
+          scaffoldBackgroundColor: AppColors.background,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: true,
+            iconTheme: IconThemeData(color: Colors.white),
+            titleTextStyle: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Inter',
+            ),
+          ),
         ),
         initialRoute: '/login',
         routes: {
@@ -50,6 +65,8 @@ class MyApp extends StatelessWidget {
           // Transaction Routes
           '/transactions': (context) => const TransactionListScreen(),
           '/add-transaction': (context) => const AddTransactionScreen(),
+          '/categories': (context) => const CategoryListScreen(),
+          '/add-category': (context) => const AddCategoryScreen(),
         },
       ),
     );

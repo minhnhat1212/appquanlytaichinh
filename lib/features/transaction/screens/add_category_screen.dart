@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../widgets/custom_button.dart';
-import '../../../../widgets/custom_textfield.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/transaction_provider.dart';
 
@@ -15,127 +13,159 @@ class AddCategoryScreen extends StatefulWidget {
 
 class _AddCategoryScreenState extends State<AddCategoryScreen> {
   final _nameController = TextEditingController();
-  String _type = 'expense'; // expense or income
-  String _selectedColor = '0xFFEF5350'; // Red
-  String _selectedIcon = 'check_circle';
+  String _selectedType = 'expense';
+  String _selectedIcon = 'category';
+  Color _selectedColor = Colors.blue;
   bool _isLoading = false;
 
-  final List<String> _colors = [
-    '0xFFEF5350',
-    '0xFFEC407A',
-    '0xFFAB47BC',
-    '0xFF7E57C2',
-    '0xFF5C6BC0',
-    '0xFF42A5F5',
-    '0xFF29B6F6',
-    '0xFF26C6DA',
-    '0xFF26A69A',
-    '0xFF66BB6A',
-    '0xFF9CCC65',
-    '0xFFD4E157',
-    '0xFFFFEE58',
-    '0xFFFFCA28',
-    '0xFFFF7043',
-    '0xFF8D6E63',
+  final List<String> _icons = [
+    'food',
+    'shopping',
+    'transport',
+    'bills',
+    'entertainment',
+    'category',
+    'gift',
+    'salary',
   ];
 
-  final Map<String, IconData> _icons = {
-    'restaurant': Icons.restaurant,
-    'directions_car': Icons.directions_car,
-    'home': Icons.home,
-    'movie': Icons.movie,
-    'shopping_bag': Icons.shopping_bag,
-    'shopping_cart': Icons.shopping_cart,
-    'flight': Icons.flight,
-    'school': Icons.school,
-    'medical_services': Icons.medical_services,
-    'sports_soccer': Icons.sports_soccer,
-    'pets': Icons.pets,
-    'work': Icons.work,
-  };
+  final List<Color> _colors = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+    Colors.pink,
+    Colors.brown,
+  ];
 
-  void _save() async {
-    if (_nameController.text.isEmpty) return;
+  void _submit() async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng nhập tên danh mục')),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
+
     final user = Provider.of<AuthProvider>(context, listen: false);
-    final provider = Provider.of<TransactionProvider>(context, listen: false);
+    final hexColor = '#${_selectedColor.value.toRadixString(16).substring(2)}';
 
-    final success = await provider.addCategory(
-      name: _nameController.text,
-      type: _type,
-      icon: _selectedIcon,
-      color: _selectedColor,
-      userId: user.userId,
-    );
+    final success =
+        await Provider.of<TransactionProvider>(
+          context,
+          listen: false,
+        ).addCategory(
+          userId: user.userId,
+          name: name,
+          type: _selectedType,
+          icon: _selectedIcon,
+          color: hexColor,
+        );
 
-    if (mounted) {
-      setState(() => _isLoading = false);
-      if (success) Navigator.pop(context);
+    setState(() => _isLoading = false);
+
+    if (success) {
+      if (mounted) Navigator.pop(context);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Có lỗi xảy ra')));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Thêm Danh Mục'),
+        title: const Text('Thêm danh mục'),
         backgroundColor: AppColors.primary,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Preview Circle
+            Center(
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: _selectedColor.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: _selectedColor, width: 2),
+                ),
+                child: Icon(
+                  _getIconData(_selectedIcon),
+                  size: 40,
+                  color: _selectedColor,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            // Name Input
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Tên danh mục',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
             // Type Selector
             Row(
               children: [
                 Expanded(
-                  child: RadioListTile(
-                    title: const Text('Khoản Chi'),
-                    value: 'expense',
-                    groupValue: _type,
-                    onChanged: (v) => setState(() => _type = v.toString()),
+                  child: _buildTypeButton(
+                    'Chi phí',
+                    'expense',
+                    AppColors.accent,
                   ),
                 ),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: RadioListTile(
-                    title: const Text('Khoản Thu'),
-                    value: 'income',
-                    groupValue: _type,
-                    onChanged: (v) => setState(() => _type = v.toString()),
+                  child: _buildTypeButton(
+                    'Thu nhập',
+                    'income',
+                    AppColors.success,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 24),
 
-            CustomTextField(
-              controller: _nameController,
-              labelText: 'Tên danh mục',
-            ),
-            const SizedBox(height: 20),
-
+            // Color Picker
             const Text(
-              'Chọn Màu',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              'Màu sắc',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: 12,
+              runSpacing: 12,
               children: _colors
                   .map(
-                    (c) => GestureDetector(
-                      onTap: () => setState(() => _selectedColor = c),
+                    (color) => GestureDetector(
+                      onTap: () => setState(() => _selectedColor = color),
                       child: Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Color(int.parse(c)),
+                          color: color,
                           shape: BoxShape.circle,
-                          border: _selectedColor == c
-                              ? Border.all(width: 3, color: Colors.black)
+                          border: _selectedColor == color
+                              ? Border.all(color: Colors.black54, width: 3)
                               : null,
                         ),
                       ),
@@ -143,45 +173,116 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                   )
                   .toList(),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
+            // Icon Picker
             const Text(
-              'Chọn Icon',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              'Biểu tượng',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: _icons.entries
+              spacing: 12,
+              runSpacing: 12,
+              children: _icons
                   .map(
-                    (e) => GestureDetector(
-                      onTap: () => setState(() => _selectedIcon = e.key),
+                    (icon) => GestureDetector(
+                      onTap: () => setState(() => _selectedIcon = icon),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        width: 45,
+                        height: 45,
                         decoration: BoxDecoration(
-                          color: _selectedIcon == e.key
-                              ? AppColors.primary.withOpacity(0.2)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(5),
-                          border: _selectedIcon == e.key
-                              ? Border.all(color: AppColors.primary)
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: _selectedIcon == icon
+                              ? Border.all(color: AppColors.primary, width: 2)
                               : null,
                         ),
-                        child: Icon(e.value, size: 30, color: AppColors.black),
+                        child: Icon(
+                          _getIconData(icon),
+                          color: _selectedIcon == icon
+                              ? AppColors.primary
+                              : Colors.grey,
+                        ),
                       ),
                     ),
                   )
                   .toList(),
             ),
 
-            const SizedBox(height: 30),
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : CustomButton(text: 'Lưu', onPressed: _save),
+            const SizedBox(height: 40),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: _isLoading ? null : _submit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Lưu danh mục',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildTypeButton(String label, String value, Color activeColor) {
+    final isSelected = _selectedType == value;
+    return InkWell(
+      onTap: () => setState(() => _selectedType = value),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor.withOpacity(0.1) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected ? Border.all(color: activeColor, width: 2) : null,
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isSelected ? activeColor : Colors.grey[600],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'food':
+        return Icons.fastfood;
+      case 'shopping':
+        return Icons.shopping_bag;
+      case 'transport':
+        return Icons.directions_car;
+      case 'bills':
+        return Icons.receipt;
+      case 'entertainment':
+        return Icons.movie;
+      case 'salary':
+        return Icons.attach_money;
+      case 'gift':
+        return Icons.card_giftcard;
+      default:
+        return Icons.category;
+    }
   }
 }

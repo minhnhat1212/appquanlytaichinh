@@ -44,16 +44,20 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Register
-  Future<bool> register(String email, String password, String phone) async {
+  Future<bool> register(
+      String name, String email, String password, String phone) async {
     try {
       final response = await http.post(
         Uri.parse(ApiConstants.register),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'phone': phone,
-        }),
+        body: jsonEncode(
+          {
+            'name': name,
+            'email': email,
+            'password': password,
+            'phone': phone,
+          },
+        ),
       );
 
       if (response.statusCode == 200) {

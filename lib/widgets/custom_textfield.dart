@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
-import '../core/constants/app_colors.dart';
+import 'package:appquanlytaichinh/core/constants/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
-  final String labelText;
-  final bool obscureText;
-  final TextInputType keyboardType;
+  final String label;
+  final String? hint;
+  final bool isPassword;
+  final TextInputType inputType;
+  final IconData? icon;
   final String? Function(String?)? validator;
 
   const CustomTextField({
     Key? key,
     required this.controller,
-    required this.labelText,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
+    required this.label,
+    this.hint,
+    this.isPassword = false,
+    this.inputType = TextInputType.text,
+    this.icon,
     this.validator,
   }) : super(key: key);
 
@@ -21,11 +25,12 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
+      obscureText: isPassword,
+      keyboardType: inputType,
       validator: validator,
       decoration: InputDecoration(
-        labelText: labelText,
+        labelText: label,
+        hintText: hint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -37,6 +42,7 @@ class CustomTextField extends StatelessWidget {
         ),
         filled: true,
         fillColor: AppColors.white,
+        prefixIcon: icon != null ? Icon(icon, color: AppColors.primary) : null,
       ),
     );
   }
