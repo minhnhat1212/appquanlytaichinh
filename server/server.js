@@ -90,29 +90,74 @@ const Transaction = require('./models/Transaction');
 // Change Password...
 
 // --- Category Routes ---
+// Get Categories (Default + User Custom)
 app.get('/api/categories', async (req, res) => {
     try {
-        // Get default categories + user specific categories (if any implementation later)
-        // For now, let's just seed some defaults if empty
-        const count = await Category.countDocuments();
+        const { userId } = req.query;
+
+        // Logic: Find categories where (isDefault = true) OR (user = userId)
+        // Note: If userId is not provided, returns only defaults.
+
+        const query = {
+            $or: [
+                { isDefault: true },
+                ...(userId ? [{ user: userId }] : [])
+            ]
+        };
+
+        // Seed defaults logic (Keep existing but simplified)
+        const count = await Category.countDocuments({ isDefault: true });
         if (count === 0) {
+            // ... existing seed code ...
             const defaults = [
-                { name: 'Ăn uống', type: 'expense', icon: 'restaurant', isDefault: true },
-                { name: 'Di chuyển', type: 'expense', icon: 'directions_car', isDefault: true },
-                { name: 'Nhà cửa', type: 'expense', icon: 'home', isDefault: true },
-                { name: 'Giải trí', type: 'expense', icon: 'movie', isDefault: true },
-                { name: 'Mua sắm', type: 'expense', icon: 'shopping_bag', isDefault: true },
-                { name: 'Lương', type: 'income', icon: 'attach_money', isDefault: true },
-                { name: 'Thưởng', type: 'income', icon: 'card_giftcard', isDefault: true },
-                { name: 'Khác', type: 'income', icon: 'more_horiz', isDefault: true },
+                { name: 'Ăn uống', type: 'expense', icon: 'restaurant', color: '0xFFE57373', isDefault: true },
+                { name: 'Di chuyển', type: 'expense', icon: 'directions_car', color: '0xFF64B5F6', isDefault: true },
+                { name: 'Nhà cửa', type: 'expense', icon: 'home', color: '0xFFFFB74D', isDefault: true },
+                { name: 'Giải trí', type: 'expense', icon: 'movie', color: '0xFFBA68C8', isDefault: true },
+                { name: 'Mua sắm', type: 'expense', icon: 'shopping_bag', color: '0xFF4DB6AC', isDefault: true },
+                { name: 'Lương', type: 'income', icon: 'attach_money', color: '0xFF81C784', isDefault: true },
+                { name: 'Thưởng', type: 'income', icon: 'card_giftcard', color: '0xFFAED581', isDefault: true },
+                { name: 'Khác', type: 'income', icon: 'more_horiz', color: '0xFFE0E0E0', isDefault: true },
             ];
             await Category.insertMany(defaults);
         }
 
-        const categories = await Category.find();
+        const categories = await Category.find(query);
         res.json({ success: true, data: categories });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Lỗi lấy danh mục' });
+    }
+});
+
+// Add User Category
+app.post('/api/categories', async (req, res) => {
+    try {
+        const { name, type, icon, color, userId } = req.body;
+        const newCat = new Category({
+            name, type, icon, color,
+            user: userId,
+            isDefault: false
+        });
+        await newCat.save();
+        res.json({ success: true, data: newCat });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi tạo danh mục' });
+    }
+});
+
+// Delete User Category
+app.delete('/api/categories/:id', async (req, res) => {
+    try {
+        // Prevent deleting defaults just in case (though UI should handle)
+        const cat = await Category.findById(req.params.id);
+        if (cat && cat.isDefault) {
+            return res.status(403).json({ success: false, message: 'Không thể xóa danh mục mặc định' });
+        }
+
+        await Category.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: 'Đã xóa danh mục' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi xóa danh mục' });
     }
 });
 

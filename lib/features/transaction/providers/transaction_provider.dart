@@ -15,9 +15,14 @@ class TransactionProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   // Fetch Categories
-  Future<void> fetchCategories() async {
+  Future<void> fetchCategories(String userId) async {
     try {
-      final response = await http.get(Uri.parse(ApiConstants.categories));
+      // Send userId in query params
+      final uri = Uri.parse(
+        ApiConstants.categories,
+      ).replace(queryParameters: {'userId': userId});
+      final response = await http.get(uri);
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success']) {
@@ -30,6 +35,52 @@ class TransactionProvider with ChangeNotifier {
     } catch (e) {
       print('Error fetching categories: $e');
     }
+  }
+
+  // Add Category
+  Future<bool> addCategory({
+    required String name,
+    required String type,
+    required String icon,
+    required String color,
+    required String userId,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.categories),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': name,
+          'type': type,
+          'icon': icon,
+          'color': color,
+          'userId': userId,
+        }),
+      );
+      if (response.statusCode == 200) {
+        await fetchCategories(userId);
+        return true;
+      }
+    } catch (e) {
+      print('Error adding category: $e');
+    }
+    return false;
+  }
+
+  // Delete Category
+  Future<bool> deleteCategory(String id, String userId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.categories}/$id'),
+      );
+      if (response.statusCode == 200) {
+        await fetchCategories(userId);
+        return true;
+      }
+    } catch (e) {
+      print('Error deleting category: $e');
+    }
+    return false;
   }
 
   // Fetch Transactions

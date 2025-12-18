@@ -14,6 +14,10 @@ const CategorySchema = new mongoose.Schema({
         type: String, // Store icon code or name
         default: 'help_outline'
     },
+    color: {
+        type: String, // Hex code
+        default: '0xFF000000'
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

@@ -24,11 +24,11 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
           context,
           listen: false,
         ).fetchTransactions(user.userId);
+        Provider.of<TransactionProvider>(
+          context,
+          listen: false,
+        ).fetchCategories(user.userId);
       }
-      Provider.of<TransactionProvider>(
-        context,
-        listen: false,
-      ).fetchCategories();
     });
   }
 
@@ -54,6 +54,12 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
             icon: const Icon(Icons.person),
             onPressed: () {
               Navigator.pushNamed(context, '/profile');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.category),
+            onPressed: () {
+              Navigator.pushNamed(context, '/categories');
             },
           ),
           IconButton(

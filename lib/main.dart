@@ -10,6 +10,8 @@ import 'features/user/screens/change_password_screen.dart';
 import 'features/transaction/providers/transaction_provider.dart';
 import 'features/transaction/screens/transaction_list_screen.dart';
 import 'features/transaction/screens/add_transaction_screen.dart';
+import 'features/transaction/screens/category_list_screen.dart';
+import 'features/transaction/screens/add_category_screen.dart';
 
 void main() {
   runApp(const MyApp());
