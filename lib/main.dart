@@ -12,6 +12,10 @@ import 'features/transaction/screens/transaction_list_screen.dart';
 import 'features/transaction/screens/add_transaction_screen.dart';
 import 'features/transaction/screens/category_list_screen.dart';
 import 'features/transaction/screens/add_category_screen.dart';
+import 'features/wallet/providers/wallet_provider.dart';
+import 'features/wallet/screens/wallet_list_screen.dart';
+import 'features/wallet/screens/add_wallet_screen.dart';
+import 'features/wallet/screens/wallet_transfer_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +30,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
+        ChangeNotifierProvider(create: (_) => WalletProvider()),
       ],
       child: MaterialApp(
         title: 'Quản Lý Tài Chính',
@@ -67,6 +72,11 @@ class MyApp extends StatelessWidget {
           '/add-transaction': (context) => const AddTransactionScreen(),
           '/categories': (context) => const CategoryListScreen(),
           '/add-category': (context) => const AddCategoryScreen(),
+
+          // Wallet Routes
+          '/wallets': (context) => const WalletListScreen(),
+          '/add-wallet': (context) => const AddWalletScreen(),
+          '/wallet-transfer': (context) => const WalletTransferScreen(),
         },
       ),
     );

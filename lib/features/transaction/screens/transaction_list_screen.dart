@@ -57,6 +57,10 @@ class _TransactionListScreenState extends State<TransactionListScreen> {
             },
           ),
           IconButton(
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            onPressed: () => Navigator.pushNamed(context, '/wallets'),
+          ),
+          IconButton(
             icon: const Icon(Icons.category_outlined),
             onPressed: () => Navigator.pushNamed(context, '/categories'),
           ),
